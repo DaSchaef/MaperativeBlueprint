@@ -1,0 +1,171 @@
+// Based on http://wiki.openstreetmap.org/wiki/User:Ianlopez1115/Blueprint2
+// and http://wiki.openstreetmap.org/wiki/User:ABRob/Maperitive Regeln/Schwarzplan
+// NOTE: A Schwarzplan is known in English-speaking areas as a Figure-ground diagram.
+
+// Released under the WTFPL (http://www.wtfpl.net/txt/copying)
+
+features
+	lines
+		all lines : 
+		oneway : oneway=yes OR oneway=true OR oneway=-1
+		coastline : natural=coastline
+		river : waterway=river
+		stream : waterway=stream
+		canal : waterway=canal
+		drain : waterway=drain
+		dock : waterway=dock
+		railway rail : railway=rail
+		railway lightrail : railway=light_rail
+		platform : railway=platform OR public_transport=platform
+		line barrier : barrier=wall OR barrier=fence
+		highway motorway : highway=motorway OR (highway=construction AND construction=motorway)
+		highway motorway link : highway=motorway_link OR (highway=construction AND construction=motorway_link)
+		highway trunk : highway=trunk OR (highway=construction AND construction=trunk)
+		highway trunk link: highway=trunk_link OR (highway=construction AND construction=trunk_link)
+		highway primary link : highway=primary_link OR (highway=construction AND construction=primary_link)
+		highway primary : highway=primary OR (highway=construction AND construction=primary)
+		highway secondary : highway=secondary OR (highway=construction AND construction=secondary)
+		highway tertiary : highway=tertiary OR (highway=construction AND construction=tertiary)
+		highway unclassified : highway=unclassified OR (highway=construction AND construction=unclassified)
+		highway residential : highway=residential OR (highway=construction AND construction=residential)
+		highway living_street : highway=living_street OR (highway=construction AND construction=living_street)
+		highway construction : highway=construction
+		highway service : highway=service
+		highway pedestrian : highway=pedestrian
+		highway track : highway=track
+		highway footway : highway=footway
+		highway cycleway : highway=cycleway
+		highway path : highway=path
+		highway access private : access=private AND highway
+		highway access destination : access=destination AND highway
+		highway steps : highway=steps
+		pier : man_made=pier
+		bridge foot : bridge=yes AND (foot=yes OR highway=footway)
+		historic citywalls : historic=citywalls OR historic=city_wall
+		power_line : power=line OR power=minor_line
+		aerialway closed: @isOneOf(aerialway,cable_car,gondola,mixed_lift)
+		aerialway open: @isOneOf(aerialway,chair_lift,drag_lift)
+
+		aeroway runway : aeroway=runway
+		aeroway taxiway : aeroway=taxiway
+
+		boundary country : boundary=administrative AND (admin_level=2 OR admin_level=4) AND NOT natural=coastline
+		boundary province : boundary=administrative AND admin_level=6
+		boundary municipal : boundary=administrative AND admin_level=8
+
+		contour major : contour[@isMulti(elevation, 100)]
+		contour minor : contour[@isMulti(elevation, 20) and not @isMulti(elevation, 100)]
+
+		gps tracks : gpstrack[]
+		gps routes : gpsroute[]
+
+		major road : @isOneOf(highway, trunk, trunk_link, primary, primary_link, secondary, tertiary)
+		minor road2 : trunk OR highway=path OR highway=trail OR highway=track OR highway=bridleway  OR highway=pedestrian or @isOneOf(unclassified, residential, service, tracktype, grade1, grade2, grade3)
+	areas
+		building : building
+		all areas : 
+		water : natural=water OR waterway=riverbank OR landuse=reservoir OR landuse=basin or waterway=dock
+		areneed: landuse=meadow OR landuse=forest
+
+	points
+		place city : place=city
+		place town : place=town
+		place village : place=village
+		place hamlet : place=hamlet
+		place locality: place=locality
+		place isolated_dwelling : place=isolated_dwelling
+		place suburb : place=suburb
+
+properties
+	map-background-color : #3B5998
+	font-weight : bold
+	font-family : Verdana
+	text-max-width : 7
+	text-halo-width : 45%
+	text-halo-opacity : 0.75
+	text-align-horizontal : center
+	text-align-vertical : center
+	font-stretch : 0.9
+	
+rules
+	target: water
+		define
+			fill-color : #bfd3ff
+			fill-opacity : 1
+			line-style : none
+			line-width : 0
+			border-style : none
+		draw : fill
+	target : river
+		define
+			line-color : #bfd3ff
+			line-width : 3
+		draw : line
+	target : $featuretype(point)
+		if : place*
+			define
+				font-weight : bold
+				text-max-width : 1000
+				text-align-horizontal : near
+
+			if : *city
+				define
+					font-size : 6
+					placement-value : 10
+			elseif : *town
+				define
+					font-size : 6
+					placement-value : 10
+			elseif : *village
+				define
+					font-size : 6
+					placement-value : 10
+			else
+				stop
+			draw : text
+
+	target : highway*
+		define
+			line-style : solid
+			line-join : round
+			line-start-cap : round
+			line-end-cap : round
+
+		if : *motorway*
+			if : *link
+				define
+					line-width : 5
+			else
+				define
+					line-width : 5
+			define
+				line-color : white
+			draw : line
+		elseif : *trunk*
+			define
+				line-color : #233a66
+				line-width : 1
+			draw : line
+		elseif : *primary*
+			define
+				line-color : #26345d
+				line-width : 2
+			draw : line
+		elseif : *secondary
+			define
+				line-color :  #26345d
+				line-width : 2
+			draw : line
+		elseif : *tertiary
+			define
+				line-color : white
+				line-width : 1
+			draw : line
+		elseif : $regex("(.*residential)|(.*unclassified)")
+			define
+				line-color : #9da4b8
+				line-width : 1
+			draw : line
+		else
+			stop
+	
