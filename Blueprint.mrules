@@ -4,6 +4,9 @@
 
 // Released under the WTFPL (http://www.wtfpl.net/txt/copying)
 
+// Install in command promt of Maperitive:
+// use-ruleset location=Rules/Blueprint.mrules as-alias=blueprint
+
 features
 	lines
 		all lines : 
